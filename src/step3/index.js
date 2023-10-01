@@ -47,17 +47,41 @@ class PromiseJz {
   }
 
   then(onFulfilled, onRejected) {
-    if(this.state === STATE_FULFILLED) {
-      onFulfilled(this.value)
-    }
-    if(this.state === STATE_REJECTED) {
-      onRejected(this.reason)
-    }
-    if(this.state === STATE_PENDING) {
-      // pending状态时，无法执行回调，因此把状态写入属性中，等后续状态改变时执行
-      this.onFulfilledCallbackList.push(onFulfilled)
-      this.onRejectedCallbackList.push(onRejected)
-    }
+    // 返回Promise，适配链式调用
+    return new PromiseJz((resolve, reject) => {
+      if(this.state === STATE_FULFILLED) {
+        try {
+          resolve(onFulfilled(this.value))
+        } catch(err) {
+          reject(err)
+        }
+      }
+      if(this.state === STATE_REJECTED) {
+        try {
+          resolve(onRejected(this.reason))
+        } catch(err) {
+          reject(err)
+        }
+      }
+      if(this.state === STATE_PENDING) {
+        // pending状态时，无法执行回调，因此把状态写入属性中，等后续状态改变时执行
+        // 处理链式调用，需要返回promise状态
+        this.onFulfilledCallbackList.push((value) => {
+          try {
+            resolve(onFulfilled(value))
+          } catch(err) {
+            reject(err)
+          }
+        })
+        this.onRejectedCallbackList.push(reason => {
+          try {
+            resolve(onRejected(reason))
+          } catch(err) {
+            reject(err)
+          }
+        })
+      }
+    })
   }
 }
 
