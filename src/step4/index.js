@@ -24,6 +24,8 @@ class PromiseJz {
   // 异步promise调用then时的回调 处理对同一个Promise多次调用then的情况，需要用数组
   onFulfilledCallbackList = []
   onRejectedCallbackList = []
+  // 是否传入过then中的onRejected
+  thenOnRejectedFlag = false
 
   resolve(value) {
     // 只处理pending状态
@@ -63,8 +65,10 @@ class PromiseJz {
       }
     } catch(err) {
       reject(err)
+      if(!thenPromise.thenOnRejectedFlag)
+        throw err
     }
-}
+  }
 
   then(onFulfilled, onRejected) {
     // 回调的默认值，适用于省略入参
@@ -74,6 +78,8 @@ class PromiseJz {
     if(!onRejected) {
       // 使用引发异常的方式来传递 rejected状态
       onRejected = reason => { throw reason }
+    } else {
+      this.thenOnRejectedFlag = true
     }
     // 返回Promise，适配链式调用
     const thenPromise = new PromiseJz((resolve, reject) => {

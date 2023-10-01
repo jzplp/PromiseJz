@@ -13,14 +13,8 @@ const prom16Then = prom16.then(value => {
 prom16Then.then(value => {
   console.log('prom16成功2', value)
 })
-
-const prom18 = new PromiseJz(function (resolve, reject) {
-  setTimeout(() => resolve(prom18), 1000)
-})
-prom18.then(value => {
-  console.log(value)
-})
-
+*/
+/*
 const prom19 = new PromiseJz(function (resolve, reject) {
   setTimeout(() => resolve(1), 1000)
 })
@@ -36,7 +30,7 @@ prom20.then(value => {
 }).then(() => {}, reason => {
   console.log('prom20失败2',reason)
 })
-*/
+
 
 const prom21 = new PromiseJz(function (resolve, reject) {
   setTimeout(() => resolve(1), 1000)
@@ -44,10 +38,28 @@ const prom21 = new PromiseJz(function (resolve, reject) {
   throw Error(value)
 })
 // 情况1
-prom21.then(() => {})
+// prom21.then(() => {})
 // 情况2
-/*
 prom21.then(() => {}, reason => {
-  console.log('prom20失败2',reason)
+  console.log('prom21失败2',reason)
 })
 */
+/*
+const prom22 = new PromiseJz(function (resolve, reject) {
+  setTimeout(() => resolve(1), 1000)
+}).then(value => {
+  throw Error(value)
+})
+setTimeout(() => {
+  prom22.then(() => {}, reason => {
+    console.log('prom22失败2',reason)
+  })
+}, 2000)
+*/
+
+const prom18 = new PromiseJz(function (resolve, reject) {
+  setTimeout(() => resolve(prom18), 1000)
+})
+prom18.then(value => {
+  console.log(value)
+})
