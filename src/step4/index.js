@@ -47,20 +47,24 @@ class PromiseJz {
   }
 
   // then中的回调处理
-  // value 返回值  onCallback 回调
-  resolutionProduce(value, onCallback, resolve, reject) {
+  // thenPromise then返回的Promise value 返回值  onCallback 回调
+  resolutionProduce(thenPromise, value, onCallback, resolve, reject) {
     try {
       const newValue = onCallback(value)
+      // 如果循环调用自身，抛出TypeError
+      if(thenPromise === newValue) {
+        throw TypeError('Chaining cycle detected for promise #<Promise>')
+      }
       // 如果返回一个Promise，那么状态要根据这个Promise来定
       if(newValue instanceof PromiseJz) {
         newValue.then(resolve, reject)
       } else {
         resolve(newValue)
-        }
+      }
     } catch(err) {
       reject(err)
     }
-  }
+}
 
   then(onFulfilled, onRejected) {
     // 回调的默认值，适用于省略入参
@@ -72,23 +76,24 @@ class PromiseJz {
       onRejected = reason => { throw reason }
     }
     // 返回Promise，适配链式调用
-    return new PromiseJz((resolve, reject) => {
+    const thenPromise = new PromiseJz((resolve, reject) => {
       if(this.state === STATE_FULFILLED) {
-        this.resolutionProduce(this.value, onFulfilled, resolve, reject)
+        this.resolutionProduce(thenPromise, this.value, onFulfilled, resolve, reject)
       }
       if(this.state === STATE_REJECTED) {
-        this.resolutionProduce(this.reason, onRejected, resolve, reject)
+        this.resolutionProduce(thenPromise, this.reason, onRejected, resolve, reject)
       }
       if(this.state === STATE_PENDING) {
         // pending状态时，无法执行回调，因此把状态写入属性中，等后续状态改变时执行
         this.onFulfilledCallbackList.push((value) => {
-          this.resolutionProduce(value, onFulfilled, resolve, reject)
+          this.resolutionProduce(thenPromise, value, onFulfilled, resolve, reject)
         })
         this.onRejectedCallbackList.push(reason => {
-          this.resolutionProduce(reason, onRejected, resolve, reject)
+          this.resolutionProduce(thenPromise, reason, onRejected, resolve, reject)
         })
       }
     })
+    return thenPromise
   }
 }
 
