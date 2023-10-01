@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test:step1": "node src/step1/test",
-    "test:step2": "node src/step2/test"
+    "test:step2": "node src/step2/test",
+    "test:step3": "node src/step3/test"
   },
   "keywords": [],
   "author": "",
