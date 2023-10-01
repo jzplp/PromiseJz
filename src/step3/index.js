@@ -46,39 +46,46 @@ class PromiseJz {
     this.onRejectedCallbackList = []
   }
 
+  // then中的回调处理
+  // value 返回值  onCallback 回调
+  resolutionProduce(value, onCallback, resolve, reject) {
+    try {
+      const newValue = onCallback(value)
+      // 如果返回一个Promise，那么状态要根据这个Promise来定
+      if(newValue instanceof PromiseJz) {
+        newValue.then(resolve, reject)
+      } else {
+        resolve(newValue)
+        }
+    } catch(err) {
+      reject(err)
+    }
+  }
+
   then(onFulfilled, onRejected) {
+    // 回调的默认值，适用于省略入参
+    if(!onFulfilled) {
+      onFulfilled = value => value
+    }
+    if(!onRejected) {
+      // 使用引发异常的方式来传递 rejected状态
+      onRejected = reason => { throw reason }
+    }
     // 返回Promise，适配链式调用
     return new PromiseJz((resolve, reject) => {
       if(this.state === STATE_FULFILLED) {
-        try {
-          resolve(onFulfilled(this.value))
-        } catch(err) {
-          reject(err)
-        }
+        this.resolutionProduce(this.value, onFulfilled, resolve, reject)
       }
       if(this.state === STATE_REJECTED) {
-        try {
-          resolve(onRejected(this.reason))
-        } catch(err) {
-          reject(err)
-        }
+        this.resolutionProduce(this.reason, onRejected, resolve, reject)
       }
       if(this.state === STATE_PENDING) {
         // pending状态时，无法执行回调，因此把状态写入属性中，等后续状态改变时执行
-        // 处理链式调用，需要返回promise状态
         this.onFulfilledCallbackList.push((value) => {
-          try {
-            resolve(onFulfilled(value))
-          } catch(err) {
-            reject(err)
-          }
+          this.resolutionProduce(value, onFulfilled, resolve, reject)
         })
         this.onRejectedCallbackList.push(reason => {
-          try {
-            resolve(onRejected(reason))
-          } catch(err) {
-            reject(err)
-          }
+          this.resolutionProduce(reason, onRejected, resolve, reject)
         })
       }
     })
