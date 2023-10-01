@@ -17,18 +17,43 @@ class PromiseJz {
 
   // 实例属性 状态，默认为pending
   state = STATE_PENDING
+  // 成功的值
+  value = null
+  // 失败的原因
+  reason = null
+  // 异步promise调用then时的回调
+  onFulfilledCallback = null
+  onRejectedCallback = null
 
-  // resolve函数
   resolve(value) {
     // 只处理pending状态
     if(this.state !== STATE_PENDING) return
     this.state = STATE_FULFILLED
+    this.value = value
+    // 状态改变时如果有回调函数需要执行
+    if(this.onFulfilledCallback) this.onFulfilledCallback(value)
   }
-  // reject函数
   reject(reason) {
     // 只处理pending状态
     if(this.state !== STATE_PENDING) return
     this.state = STATE_REJECTED
+    this.reason = reason
+    // 状态改变时如果有回调函数需要执行
+    if(this.onRejectedCallback) this.onRejectedCallback(reason)
+  }
+
+  then(onFulfilled, onRejected) {
+    if(this.state === STATE_FULFILLED) {
+      onFulfilled(this.value)
+    }
+    if(this.state === STATE_REJECTED) {
+      onRejected(this.reason)
+    }
+    if(this.state === STATE_PENDING) {
+      // pending状态时，无法执行回调，因此把状态写入属性中，等后续状态改变时执行
+      this.onFulfilledCallback = onFulfilled
+      this.onRejectedCallback = onRejected
+    }
   }
 }
 

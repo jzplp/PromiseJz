@@ -17,14 +17,11 @@ class PromiseJz {
 
   // 实例属性 状态，默认为pending
   state = STATE_PENDING
-
-  // resolve函数
   resolve(value) {
     // 只处理pending状态
     if(this.state !== STATE_PENDING) return
     this.state = STATE_FULFILLED
   }
-  // reject函数
   reject(reason) {
     // 只处理pending状态
     if(this.state !== STATE_PENDING) return
