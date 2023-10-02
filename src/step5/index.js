@@ -132,10 +132,10 @@ class PromiseJz {
 
   then(onFulfilled, onRejected) {
     // 回调的默认值，适用于省略入参
-    if(!onFulfilled) {
+    if(typeof onFulfilled !== 'function') {
       onFulfilled = value => value
     }
-    if(!onRejected) {
+    if(typeof onRejected !== 'function') {
       // 使用引发异常的方式来传递 rejected状态
       onRejected = reason => { throw reason }
     } else {
