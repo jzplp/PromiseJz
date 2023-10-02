@@ -8,12 +8,16 @@
     "test:step2": "node src/step2/test",
     "test:step3": "node src/step3/test",
     "test:step4": "node src/step4/test",
-    "test:step5": "node src/step5/test"
+    "test:step5": "node src/step5/test",
+    "test:APlus": "promises-aplus-tests src/step5/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.50.0"
+  },
+  "dependencies": {
+    "promises-aplus-tests": "^2.1.2"
   }
 }

@@ -170,7 +170,7 @@ class PromiseJz {
     return thenPromise
   }
   // Promise/A+规范的测试工具使用
-  static deferrd() {
+  static deferred() {
     const res = {};
     res.promise = new PromiseJz(function (resolve, reject) {
       res.resolve = resolve;
