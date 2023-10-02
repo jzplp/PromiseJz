@@ -8,7 +8,7 @@ class PromiseJz {
   constructor(executor) {
     try {
       // 立即执行函数 需要手动指定bind指向
-      executor(this.resolve.bind(this), this.reject.bind(this))
+      executor(this.#resolve.bind(this), this.#reject.bind(this))
     } catch(err) {
       // 出现异常则认为rejected
       this.reject(err)
@@ -16,66 +16,64 @@ class PromiseJz {
   }
 
   // 实例属性 状态，默认为pending
-  state = STATE_PENDING
+  #state = STATE_PENDING
   // 成功的值
-  value = null
+  #value = null
   // 失败的原因
-  reason = null
+  #reason = null
   // 异步promise调用then时的回调 处理对同一个Promise多次调用then的情况，需要用数组
-  onFulfilledCallbackList = []
-  onRejectedCallbackList = []
-  // 是否传入过then中的onRejected
-  thenOnRejectedFlag = false
+  #onFulfilledCallbackList = []
+  #onRejectedCallbackList = []
 
-  resolve(value) {
+  #resolve(value) {
     // 在构造函数回调中返回自身
     if(value === this) {
       // 触发rejected状态
-      this.rejectHandle(TypeError('Chaining cycle detected for promise #<Promise>'))
+      this.#rejectHandle(TypeError('Chaining cycle detected for promise #<Promise>'))
       return
     }
     // 如果值为一个新的Promise，那么状态由这个新的Promise确定
     if(value instanceof PromiseJz) {
       value.then(newValue => {
-        this.resolveHandle(newValue)
+        this.#resolveHandle(newValue)
       }, newReason => {
-        this.rejectHandle(newReason)
+        this.#rejectHandle(newReason)
       })
     } else {
-      this.resolveHandle(value)
+      this.#resolveHandle(value)
     }
   }
   // resolve函数状态变更的处理逻辑
-  resolveHandle(value) {
+  #resolveHandle(value) {
     // 只处理pending状态
-    if(this.state !== STATE_PENDING) return
-    this.state = STATE_FULFILLED
-    this.value = value
+    if(this.#state !== STATE_PENDING) return
+    this.#state = STATE_FULFILLED
+    this.#value = value
     // 状态改变时如果有回调函数需要执行
-    this.onFulfilledCallbackList.forEach(callback => callback(value))
+    this.#onFulfilledCallbackList.forEach(callback => callback(value))
     // 处理完再清空数组
-    this.onFulfilledCallbackList = []
+    this.#onFulfilledCallbackList = []
   }
 
-  reject(reason) {
-    this.rejectHandle(reason)
+  #reject(reason) {
+    this.#rejectHandle(reason)
   }
 
   // reject函数状态变更的处理逻辑
-  rejectHandle(reason) {
+  #rejectHandle(reason) {
     // 只处理pending状态
-    if(this.state !== STATE_PENDING) return
-    this.state = STATE_REJECTED
-    this.reason = reason
+    if(this.#state !== STATE_PENDING) return
+    this.#state = STATE_REJECTED
+    this.#reason = reason
     // 状态改变时如果有回调函数需要执行
-    this.onRejectedCallbackList.forEach(callback => callback(reason))
+    this.#onRejectedCallbackList.forEach(callback => callback(reason))
     // 处理完再清空数组
-    this.onRejectedCallbackList = []
+    this.#onRejectedCallbackList = []
   }
 
   // then中的回调处理
   // thenPromise then返回的Promise newValue 回调的返回值  onCallback 回调
-  resolutionProduce(thenPromise, newValue, resolve, reject) {
+  #resolutionProduce(thenPromise, newValue, resolve, reject) {
       // 如果循环调用自身，抛出TypeError
       if(thenPromise === newValue) {
         reject(TypeError('Chaining cycle detected for promise #<Promise>'))
@@ -107,7 +105,7 @@ class PromiseJz {
           then.call(newValue, y => {
             if(calledFlag) return
             calledFlag = true
-            this.resolutionProduce(thenPromise, y, resolve, reject)
+            this.#resolutionProduce(thenPromise, y, resolve, reject)
           }, r => {
             if(calledFlag) return
             calledFlag = true
@@ -130,48 +128,46 @@ class PromiseJz {
     if(typeof onRejected !== 'function') {
       // 使用引发异常的方式来传递 rejected状态
       onRejected = reason => { throw reason }
-    } else {
-      this.thenOnRejectedFlag = true
     }
     // 返回Promise，适配链式调用
     const thenPromise = new PromiseJz((resolve, reject) => {
-      if(this.state === STATE_FULFILLED) {
+      if(this.#state === STATE_FULFILLED) {
         queueMicrotask(() => {
           try {
-            const newValue = onFulfilled(this.value)
-            this.resolutionProduce(thenPromise, newValue, resolve, reject)
+            const newValue = onFulfilled(this.#value)
+            this.#resolutionProduce(thenPromise, newValue, resolve, reject)
           } catch(err) {
             reject(err)
           }
         })
       }
-      if(this.state === STATE_REJECTED) {
+      if(this.#state === STATE_REJECTED) {
         queueMicrotask(() => {
           try {
-            const newValue = onRejected(this.reason)
-            this.resolutionProduce(thenPromise, newValue, resolve, reject)
+            const newValue = onRejected(this.#reason)
+            this.#resolutionProduce(thenPromise, newValue, resolve, reject)
           } catch(err) {
             reject(err)
           }
         })
       }
-      if(this.state === STATE_PENDING) {
+      if(this.#state === STATE_PENDING) {
         // pending状态时，无法执行回调，因此把状态写入属性中，等后续状态改变时执行
-        this.onFulfilledCallbackList.push((value) => {
+        this.#onFulfilledCallbackList.push((value) => {
           queueMicrotask(() => {
             try {
               const newValue = onFulfilled(value)
-              this.resolutionProduce(thenPromise, newValue, resolve, reject)
+              this.#resolutionProduce(thenPromise, newValue, resolve, reject)
             } catch(err) {
               reject(err)
             }
           })
         })
-        this.onRejectedCallbackList.push(reason => {
+        this.#onRejectedCallbackList.push(reason => {
           queueMicrotask(() => {
             try {
               const newValue = onRejected(reason)
-              this.resolutionProduce(thenPromise, newValue, resolve, reject)
+              this.#resolutionProduce(thenPromise, newValue, resolve, reject)
             } catch(err) {
               reject(err)
             }
