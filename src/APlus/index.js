@@ -15,7 +15,7 @@ class PromiseJz {
     }
   }
 
-  // 实例属性 状态，默认为pending
+  // 状态，默认为pending
   #state = STATE_PENDING
   // 成功的值
   #value = null
