@@ -85,8 +85,13 @@ class PromiseJz {
       // 如果返回一个Promise，那么状态要根据这个Promise来定
       if(newValue instanceof PromiseJz) {
         newValue.then(resolve, reject)
+      // 兼容其它的promise实现
       } else if(typeof newValue === 'object' || typeof newValue === 'function') {
-        // 兼容其它的promise实现
+        // typeof null 也是 'object'
+        if (newValue === null) {
+          resolve(newValue) 
+          return
+        }
         let then
         try {
           then = newValue.then
