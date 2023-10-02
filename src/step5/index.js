@@ -93,6 +93,32 @@ class PromiseJz {
       // 如果返回一个Promise，那么状态要根据这个Promise来定
       if(newValue instanceof PromiseJz) {
         newValue.then(resolve, reject)
+      } else if(typeof newValue === 'object' || typeof newValue === 'function') {
+        // 兼容其它的promise实现
+        let then
+        try {
+          then = newValue.then
+        } catch(e) { // 如果抛出异常则设为rejected状态
+          reject(e)
+          return
+        }
+        // 如果then不是函数，则设置fulfilled状态
+        if(typeof then !== 'function') {
+          resolve(newValue) 
+          return
+        }
+        // 是否调用过的标志 只能调用一次
+        let calledFlag = false
+        // 调用then方法
+        then.call(newValue, y => {
+          if(calledFlag) return
+          calledFlag = true
+          this.resolutionProduce(thenPromise, y, v => v, resolve, reject)
+        }, r => {
+          if(calledFlag) return
+          calledFlag = true
+          reject(r)
+        })
       } else {
         resolve(newValue)
       }
@@ -142,6 +168,15 @@ class PromiseJz {
       }
     })
     return thenPromise
+  }
+  // Promise/A+规范的测试工具使用
+  static deferrd() {
+    const res = {};
+    res.promise = new PromiseJz(function (resolve, reject) {
+      res.resolve = resolve;
+      res.reject = reject;
+    })
+    return res;
   }
 }
 
