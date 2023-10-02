@@ -76,7 +76,6 @@ class PromiseJz {
   // then中的回调处理
   // thenPromise then返回的Promise newValue 回调的返回值  onCallback 回调
   resolutionProduce(thenPromise, newValue, resolve, reject) {
-    try {
       // 如果循环调用自身，抛出TypeError
       if(thenPromise === newValue) {
         reject(TypeError('Chaining cycle detected for promise #<Promise>'))
@@ -104,21 +103,23 @@ class PromiseJz {
         // 是否调用过的标志 只能调用一次
         let calledFlag = false
         // 调用then方法
-        then.call(newValue, y => {
+        try {
+          then.call(newValue, y => {
+            if(calledFlag) return
+            calledFlag = true
+            this.resolutionProduce(thenPromise, y, resolve, reject)
+          }, r => {
+            if(calledFlag) return
+            calledFlag = true
+            reject(r)
+          })
+        } catch(err) {
           if(calledFlag) return
-          calledFlag = true
-          this.resolutionProduce(thenPromise, y, resolve, reject)
-        }, r => {
-          if(calledFlag) return
-          calledFlag = true
-          reject(r)
-        })
+          reject(err)
+        }
       } else {
         resolve(newValue)
       }
-    } catch(err) {
-      reject(err)
-    }
   }
 
   then(onFulfilled, onRejected) {
