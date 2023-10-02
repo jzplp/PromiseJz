@@ -10,14 +10,8 @@ class PromiseJz {
       // 立即执行函数 需要手动指定bind指向
       executor(this.resolve.bind(this), this.reject.bind(this))
     } catch(err) {
-      // 如果是同步代码，需要用微任务延迟执行，以获取到是否调用了then方法
-      queueMicrotask(() => {
-        // 出现异常则认为rejected
-        this.reject(err)
-        // 如果捕获不到就抛出
-        if(!this.thenOnRejectedFlag) ;
-          // throw err
-      })
+      // 出现异常则认为rejected
+      this.reject(err)
     }
   }
 
@@ -77,8 +71,6 @@ class PromiseJz {
     this.onRejectedCallbackList.forEach(callback => callback(reason))
     // 处理完再清空数组
     this.onRejectedCallbackList = []
-    // 构造函数中所有rejected都作为异常
-    // throw reason
   }
 
   // then中的回调处理
@@ -124,9 +116,6 @@ class PromiseJz {
       }
     } catch(err) {
       reject(err)
-      // 如果新Promise截止目前没有传入过onRejected，则抛出不能被捕获的异常
-      if(!thenPromise.thenOnRejectedFlag) ;
-        // throw err
     }
   }
 
