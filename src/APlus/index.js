@@ -15,8 +15,8 @@ class PromiseJz {
         // 出现异常则认为rejected
         this.reject(err)
         // 如果捕获不到就抛出
-        if(!this.thenOnRejectedFlag)
-          throw err
+        if(!this.thenOnRejectedFlag) ;
+          // throw err
       })
     }
   }
@@ -78,7 +78,7 @@ class PromiseJz {
     // 处理完再清空数组
     this.onRejectedCallbackList = []
     // 构造函数中所有rejected都作为异常
-    throw reason
+    // throw reason
   }
 
   // then中的回调处理
@@ -88,7 +88,7 @@ class PromiseJz {
       const newValue = onCallback(value)
       // 如果循环调用自身，抛出TypeError
       if(thenPromise === newValue) {
-        throw TypeError('Chaining cycle detected for promise #<Promise>')
+        reject(TypeError('Chaining cycle detected for promise #<Promise>'))
       }
       // 如果返回一个Promise，那么状态要根据这个Promise来定
       if(newValue instanceof PromiseJz) {
@@ -125,8 +125,8 @@ class PromiseJz {
     } catch(err) {
       reject(err)
       // 如果新Promise截止目前没有传入过onRejected，则抛出不能被捕获的异常
-      if(!thenPromise.thenOnRejectedFlag)
-        throw err
+      if(!thenPromise.thenOnRejectedFlag) ;
+        // throw err
     }
   }
 
