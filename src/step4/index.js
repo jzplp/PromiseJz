@@ -28,6 +28,17 @@ class PromiseJz {
   thenOnRejectedFlag = false
 
   resolve(value) {
+    // 在构造函数回调中返回自身
+    if(value === this) {
+      const err = new TypeError('Chaining cycle detected for promise #<Promise>')
+      // 如果then传入过onRejected，则不抛出异常，而是触发rejected状态 否则抛出异常
+      if(this.thenOnRejectedFlag) {
+        this.rejectHandle(err)
+      } else {
+        throw err
+      }
+      return
+    }
     // 如果值为一个新的Promise，那么状态由这个新的Promise确定
     if(value instanceof PromiseJz) {
       value.then(newValue => {

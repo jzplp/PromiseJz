@@ -104,16 +104,31 @@ prom26.then(value => {
 // new PromiseJz((resolveItem) => resolveItem(10)).then(value => console.log("prom27成功", value))
 
 
+/*
+// PromiseJz = Promise
+const prom28 = new PromiseJz(function (resolve, reject) {
+  setTimeout(() => resolve(prom28), 1000)
+})
+prom28.then(value => {
+  console.log('prom28成功', value)
+}, reason => {
+  console.log('prom28失败', reason)
+})
+*/
+
+PromiseJz = Promise
+const prom29 = new PromiseJz(function (resolve, reject) {
+  resolve(prom29)
+})
+/*
+prom29.then(null, reason => {
+  console.log('prom29失败', reason)
+})
+*/
+
+
 
 /*
-const prom23 = new PromiseJz(function (resolve, reject) {
-  setTimeout(() => resolve(prom23), 1000)
-})
-prom23.then(value => {
-  console.log('prom23成功', value)
-})
-
-
 new PromiseJz((resolve, reject) => { reject(0) })
 
 */
