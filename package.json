@@ -9,7 +9,7 @@
     "test:step3": "node src/step3/test",
     "test:step4": "node src/step4/test",
     "test:step5": "node src/step5/test",
-    "test:APlus": "promises-aplus-tests src/step5/index.js"
+    "test:APlus": "promises-aplus-tests src/APlus/index.js"
   },
   "keywords": [],
   "author": "",
