@@ -74,10 +74,9 @@ class PromiseJz {
   }
 
   // then中的回调处理
-  // thenPromise then返回的Promise value 返回值  onCallback 回调
-  resolutionProduce(thenPromise, value, onCallback, resolve, reject) {
+  // thenPromise then返回的Promise newValue 回调的返回值  onCallback 回调
+  resolutionProduce(thenPromise, newValue, resolve, reject) {
     try {
-      const newValue = onCallback(value)
       // 如果循环调用自身，抛出TypeError
       if(thenPromise === newValue) {
         reject(TypeError('Chaining cycle detected for promise #<Promise>'))
@@ -110,7 +109,7 @@ class PromiseJz {
         then.call(newValue, y => {
           if(calledFlag) return
           calledFlag = true
-          this.resolutionProduce(thenPromise, y, v => v, resolve, reject)
+          this.resolutionProduce(thenPromise, y, resolve, reject)
         }, r => {
           if(calledFlag) return
           calledFlag = true
@@ -139,24 +138,44 @@ class PromiseJz {
     const thenPromise = new PromiseJz((resolve, reject) => {
       if(this.state === STATE_FULFILLED) {
         queueMicrotask(() => {
-          this.resolutionProduce(thenPromise, this.value, onFulfilled, resolve, reject)
+          try {
+            const newValue = onFulfilled(this.value)
+            this.resolutionProduce(thenPromise, newValue, resolve, reject)
+          } catch(err) {
+            reject(err)
+          }
         })
       }
       if(this.state === STATE_REJECTED) {
         queueMicrotask(() => {
-          this.resolutionProduce(thenPromise, this.reason, onRejected, resolve, reject)
+          try {
+            const newValue = onRejected(this.reason)
+            this.resolutionProduce(thenPromise, newValue, resolve, reject)
+          } catch(err) {
+            reject(err)
+          }
         })
       }
       if(this.state === STATE_PENDING) {
         // pending状态时，无法执行回调，因此把状态写入属性中，等后续状态改变时执行
         this.onFulfilledCallbackList.push((value) => {
           queueMicrotask(() => {
-            this.resolutionProduce(thenPromise, value, onFulfilled, resolve, reject)
+            try {
+              const newValue = onFulfilled(value)
+              this.resolutionProduce(thenPromise, newValue, resolve, reject)
+            } catch(err) {
+              reject(err)
+            }
           })
         })
         this.onRejectedCallbackList.push(reason => {
           queueMicrotask(() => {
-            this.resolutionProduce(thenPromise, reason, onRejected, resolve, reject)
+            try {
+              const newValue = onRejected(reason)
+              this.resolutionProduce(thenPromise, newValue, resolve, reject)
+            } catch(err) {
+              reject(err)
+            }
           })
         })
       }
