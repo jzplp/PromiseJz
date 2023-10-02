@@ -7,7 +7,8 @@
     "test:step1": "node src/step1/test",
     "test:step2": "node src/step2/test",
     "test:step3": "node src/step3/test",
-    "test:step4": "node src/step4/test"
+    "test:step4": "node src/step4/test",
+    "test:step5": "node src/step5/test"
   },
   "keywords": [],
   "author": "",

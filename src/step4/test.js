@@ -115,20 +115,18 @@ prom28.then(value => {
   console.log('prom28失败', reason)
 })
 */
-
+/*
 PromiseJz = Promise
 const prom29 = new PromiseJz(function (resolve, reject) {
   resolve(prom29)
 })
-/*
 prom29.then(null, reason => {
   console.log('prom29失败', reason)
 })
 */
 
-
-
-/*
-new PromiseJz((resolve, reject) => { reject(0) })
-
-*/
+// PromiseJz = Promise
+const prom30 = new PromiseJz((resolve, reject) => { reject(0) })
+prom30.then(null, reason => {
+  console.log('prom30失败', reason)
+})
