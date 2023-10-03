@@ -177,6 +177,7 @@ class PromiseJz {
     })
     return thenPromise
   }
+
   // Promise/A+规范的测试工具使用
   static deferred() {
     const res = {};
@@ -185,6 +186,20 @@ class PromiseJz {
       res.reject = reject;
     })
     return res;
+  }
+
+  catch(onRejected) {
+    return this.then(null, onRejected)
+  }
+
+  finally(callback) {
+    return this.then(value => {
+      callback()
+      return value
+    }, reason => {
+      callback()
+      throw reason
+    })
   }
 }
 
