@@ -248,6 +248,47 @@ class PromiseJz {
           rejectItem(reason)
         })
       }
+      // 循环一次都没进入，实际是空数组
+      if(sum === 0)
+        resolveItem([])
+    })
+  }
+
+  static race(data) {
+    PromiseJz.#isIterator(data)
+    return new PromiseJz((resolveItem, rejectItem) => {
+      for(let item of data) {
+        PromiseJz.resolve(item).then(resolveItem, rejectItem)
+      }
+    })
+  }
+
+  static allSettled(data) {
+    PromiseJz.#isIterator(data)
+    // count为总数量，count为Promise完成的数量
+    let sum = 0, count = 0
+    // 存储promise值的数组
+    const valueList = []
+    return new PromiseJz((resolveItem, rejectItem) => {
+      for(let item of data) {
+        // 当前的序号
+        let tempi = sum++
+        valueList.push(null)
+        PromiseJz.resolve(item).then(value => {
+          ++count
+          valueList[tempi] = { status: 'fulfilled', value: value }
+          if(count === valueList.length)
+            resolveItem(valueList)
+        }, reason => {
+          ++count
+          valueList[tempi] = { status: 'rejected', reason: reason }
+          if(count === valueList.length)
+            resolveItem(valueList)
+        })
+      }
+      // 循环一次都没进入，实际是空数组
+      if(sum === 0)
+        resolveItem([])
     })
   }
 }

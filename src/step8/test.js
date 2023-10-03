@@ -1,9 +1,14 @@
 let PromiseJz = require('./index.js')
 
-PromiseJz = Promise
+// PromiseJz = Promise
 
 // PromiseJz.all(123)
-// PromiseJz.all([])
+
+/*
+PromiseJz.all([]).then(value => {
+  console.log(value)
+})
+*/
 
 const prom37 = new PromiseJz((resolve, reject) => { resolve(37) })
 const prom38 = new PromiseJz((resolve, reject) => {
@@ -13,6 +18,7 @@ const prom39 = new PromiseJz((resolve, reject) => {
   setTimeout(() => resolve(39), 1000)
 })
 
+/*
 const prom41 = new PromiseJz((resolve, reject) => {
   setTimeout(() => reject(41), 1000)
 })
@@ -37,7 +43,7 @@ const iteratorObj = {
             break
           case 3: value = prom39
             break
-          case 4: value = prom41
+          case 4: value = 40
             break
           default: return { done: true }
         }
@@ -50,8 +56,35 @@ const iteratorObj = {
   }
 };
 
+/*
 PromiseJz.all(iteratorObj).then(value => {
   console.log(value)
 }, reason => {
   console.log(reason)
 })
+
+PromiseJz.race([]).then(value => {
+  console.log(1, value)
+}, reason => {
+  console.log(2, reason)
+})
+
+PromiseJz.race(iteratorObj).then(value => {
+  console.log(1, value)
+}, reason => {
+  console.log(2, reason)
+})
+
+PromiseJz.allSettled([]).then(value => {
+  console.log(1, value)
+}, reason => {
+  console.log(2, reason)
+})
+
+PromiseJz.allSettled(iteratorObj).then(value => {
+  console.log(1, value)
+}, reason => {
+  console.log(2, reason)
+})
+
+*/
