@@ -11,7 +11,7 @@
     "test:APlus": "promises-aplus-tests src/APlus/index.js",
     "test:step6": "node src/step6/test",
     "test:step7": "node src/step7/test",
-    "test:step8": "node src/final/test",
+    "test:step8": "node src/step8/test",
     "test:APlusFinal": "promises-aplus-tests src/final/index.js"
   },
   "keywords": [],
