@@ -2,36 +2,56 @@ let PromiseJz = require('./index.js')
 
 PromiseJz = Promise
 
-/*
-const prom34 = new PromiseJz((resolve, reject) => { reject(0) }).finally(() => {
-  console.log('prom34 finally')
-})
-prom34.then(value => {
-  console.log('prom34成功', value)
-}, reason => {
-  console.log('prom34失败', reason)
-})
-*/
-/*
-const prom35 = new PromiseJz((resolve, reject) => { resolve(0) }).finally(() => {
-  console.log('prom35 finally')
-  throw 2
-})
-prom35.then(value => {
-  console.log('prom35成功', value)
-}, reason => {
-  console.log('prom35失败', reason)
-})
-*/
+// PromiseJz.all(123)
+// PromiseJz.all([])
 
-const prom36 = new PromiseJz((resolve, reject) => { resolve(0) }).finally(() => {
-  console.log('prom36 finally')
-  return new PromiseJz((resolveItem, rejectItem) => {
-    setTimeout(() => rejectItem(2), 2000)
-  })
+const prom37 = new PromiseJz((resolve, reject) => { resolve(37) })
+const prom38 = new PromiseJz((resolve, reject) => {
+  setTimeout(() => resolve(38), 2000)
 })
-prom36.then(value => {
-  console.log('prom36成功', value)
+const prom39 = new PromiseJz((resolve, reject) => {
+  setTimeout(() => resolve(39), 1000)
+})
+
+const prom41 = new PromiseJz((resolve, reject) => {
+  setTimeout(() => reject(41), 1000)
+})
+/*
+PromiseJz.all([prom37, prom38, prom39, 40, prom41]).then(value => {
+  console.log(value)
 }, reason => {
-  console.log('prom36失败', reason)
+  console.log(reason)
+})
+*/
+let count = 0
+const iteratorObj = {
+  [Symbol.iterator]: () => {
+    return {
+      next: () => {
+        ++count;
+        let value = null
+        switch(count) {
+          case 1: value = prom37
+            break
+          case 2: value = prom38
+            break
+          case 3: value = prom39
+            break
+          case 4: value = prom41
+            break
+          default: return { done: true }
+        }
+        return {
+          value: value,
+          done: false
+        };
+      }
+    };
+  }
+};
+
+PromiseJz.all(iteratorObj).then(value => {
+  console.log(value)
+}, reason => {
+  console.log(reason)
 })

@@ -217,6 +217,39 @@ class PromiseJz {
       return PromiseJz.resolve(callback()).then(() => { throw reason })
     })
   }
+
+  // 判断入参是否为Iterator
+  static #isIterator(data) {
+    if (!data || typeof data[Symbol.iterator] !== 'function') {
+      const type = typeof data
+      throw new TypeError(`${type} ${data} is not iterable (cannot read property Symbol(Symbol.iterator))`)
+    }
+  }
+
+  static all(data) {
+    PromiseJz.#isIterator(data)
+    // count为总数量，count为Promise完成的数量
+    let sum = 0, count = 0
+    // 存储promise值的数组
+    const valueList = []
+    return new PromiseJz((resolveItem, rejectItem) => {
+      for(let item of data) {
+        // 当前的序号
+        let tempi = sum++
+        valueList.push(null)
+        PromiseJz.resolve(item).then(value => {
+          ++count
+          valueList[tempi] = value
+          // 全部完成
+          if(count === valueList.length)
+            resolveItem(valueList)
+        }, reason => {
+          // 有一个出现rejected状态则返回rejected
+          rejectItem(reason)
+        })
+      }
+    })
+  }
 }
 
 module.exports = PromiseJz
