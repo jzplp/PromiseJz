@@ -18,10 +18,15 @@ const prom39 = new PromiseJz((resolve, reject) => {
   setTimeout(() => resolve(39), 1000)
 })
 
-/*
+
 const prom41 = new PromiseJz((resolve, reject) => {
   setTimeout(() => reject(41), 1000)
 })
+
+const prom42 = new PromiseJz((resolve, reject) => {
+  setTimeout(() => reject(42), 2000)
+})
+
 /*
 PromiseJz.all([prom37, prom38, prom39, 40, prom41]).then(value => {
   console.log(value)
@@ -37,13 +42,13 @@ const iteratorObj = {
         ++count;
         let value = null
         switch(count) {
-          case 1: value = prom37
+          case 1: value = prom41
             break
-          case 2: value = prom38
+          case 2: value = prom42
             break
-          case 3: value = prom39
+          case 3: value = prom38
             break
-          case 4: value = 40
+          case 4: value = prom42
             break
           default: return { done: true }
         }
@@ -86,5 +91,17 @@ PromiseJz.allSettled(iteratorObj).then(value => {
 }, reason => {
   console.log(2, reason)
 })
-
 */
+
+PromiseJz.any([]).then(value => {
+  console.log(1, value)
+}, reason => {
+  console.log(2, reason)
+})
+
+
+PromiseJz.any(iteratorObj).then(value => {
+  console.log(1, value)
+}, reason => {
+  console.log(2, reason)
+})

@@ -291,6 +291,33 @@ class PromiseJz {
         resolveItem([])
     })
   }
+
+  static any(data) {
+    PromiseJz.#isIterator(data)
+    // count为总数量，count为Promise完成的数量
+    let sum = 0, count = 0
+    // 存储promise值的数组
+    const reasonList = []
+    return new PromiseJz((resolveItem, rejectItem) => {
+      for(let item of data) {
+        // 当前的序号
+        let tempi = sum++
+        reasonList.push(null)
+        PromiseJz.resolve(item).then(value => {
+          resolveItem(value)
+        }, reason => {
+          ++count
+          reasonList[tempi] = reason
+          if(count === reasonList.length)
+          // ECMAScript要求抛出AggregateError错误
+          rejectItem(new AggregateError(reasonList, 'All promises were rejected'))
+        })
+      }
+      // 循环一次都没进入，实际是空数组 为rejected状态
+      if(sum === 0)
+        rejectItem(new AggregateError([], 'All promises were rejected'))
+    })
+  }
 }
 
 module.exports = PromiseJz
