@@ -188,6 +188,22 @@ class PromiseJz {
     })
     return res;
   }
+
+  static resolve(data) {
+    // 如果是Promise，则直接返回
+    if(data instanceof PromiseJz)
+      return data
+    // thenable对象等由then方法处理
+    return new PromiseJz(function (resolveItem, rejectItem) {
+      resolveItem(data)
+    })
+  }
+
+  static reject(data) {
+    return new PromiseJz(function (resolveItem, rejectItem) {
+      rejectItem(data)
+    })
+  }
 }
 
 module.exports = PromiseJz

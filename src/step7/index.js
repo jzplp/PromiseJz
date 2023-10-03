@@ -43,6 +43,7 @@ class PromiseJz {
       this.#resolveHandle(value)
     }
   }
+
   // resolve函数状态变更的处理逻辑
   #resolveHandle(value) {
     // 只处理pending状态
@@ -186,6 +187,22 @@ class PromiseJz {
       res.reject = reject;
     })
     return res;
+  }
+
+  static resolve(data) {
+    // 如果是Promise，则直接返回
+    if(data instanceof PromiseJz)
+      return data
+    // thenable对象等由then方法处理
+    return new PromiseJz(function (resolveItem, rejectItem) {
+      resolveItem(data)
+    })
+  }
+
+  static reject(data) {
+    return new PromiseJz(function (resolveItem, rejectItem) {
+      rejectItem(data)
+    })
   }
 
   catch(onRejected) {
