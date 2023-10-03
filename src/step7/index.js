@@ -43,7 +43,6 @@ class PromiseJz {
       this.#resolveHandle(value)
     }
   }
-
   // resolve函数状态变更的处理逻辑
   #resolveHandle(value) {
     // 只处理pending状态
@@ -187,6 +186,20 @@ class PromiseJz {
       res.reject = reject;
     })
     return res;
+  }
+
+  catch(onRejected) {
+    return this.then(null, onRejected)
+  }
+
+  finally(callback) {
+    return this.then(value => {
+      callback()
+      return value
+    }, reason => {
+      callback()
+      throw reason
+    })
   }
 }
 
