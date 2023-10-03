@@ -8,7 +8,8 @@
     "test:step2": "node src/step2/test",
     "test:step3": "node src/step3/test",
     "test:step4": "node src/step4/test",
-    "test:APlus": "promises-aplus-tests src/APlus/index.js"
+    "test:APlus": "promises-aplus-tests src/APlus/index.js",
+    "test:step6": "node src/step6/test"
   },
   "keywords": [],
   "author": "jz",
